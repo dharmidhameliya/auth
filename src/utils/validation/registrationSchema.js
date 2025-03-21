@@ -11,4 +11,4 @@ const registerSchema = Joi.object({
   role: Joi.boolean().default(false),
 });
 
-export default registerSchema;
+export default { registerSchema };
