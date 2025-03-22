@@ -21,12 +21,12 @@ app.use(express.json());
 // Routes
 app.use("/api", authRouter);
 app.use("*", (req, res, next) => {
-  const errorMessage = "Route not found"; // Default error message
-  console.error(`Error: ${errorMessage} | URL: ${req.originalUrl}`); // Log error to console
+  const errorMessage = "Route not found";
+  console.error(`Error: ${errorMessage} | URL: ${req.originalUrl}`);
 
   return res.status(404).json({ message: errorMessage });
 });
-// Start server
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

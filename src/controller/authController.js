@@ -1,14 +1,18 @@
-import registerSchema from "../utils/validation/registrationSchema.js";
-import loginSchema from "../utils/validation/loginSchema.js";
+import { registerSchema } from "../utils/validation/registrationSchema.js";
+import { loginSchema } from "../utils/validation/loginSchema.js";
 import User from "../model/userModel.js";
 import bcrypt from "bcrypt";
-import { generateToken } from "../services/tokens.js";
-
+// import Joi from "joi";
+import {
+  generateToken,
+  generateAccessToken,
+  generateRefreshToken,
+} from "../services/tokens.js";
 export const register = async (req, res, next) => {
   try {
     const { error, value } = registerSchema.validate(req.body);
 
-    if (error) return res.status(400).json({ message: "Invalid request" });
+    if (error) return res.status(400).json({ message: error.message });
 
     const { name, email, password, isadmin = false } = value;
 
@@ -47,7 +51,6 @@ export const login = async (req, res, next) => {
     const { error, value } = loginSchema.validate(req.body);
     const { email, password } = value;
     const user = await User.findOne({ email }).select("+password");
-
     if (!user) {
       return res.status(404).json({ message: "User does not exist" });
     }
@@ -60,6 +63,8 @@ export const login = async (req, res, next) => {
       return res.status(404).json({ message: "Password does not exist" });
     }
 
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
     return res.status(201).json({
       status: "success",
       user: {
@@ -68,6 +73,8 @@ export const login = async (req, res, next) => {
         id: user._id,
         isadmin: user.isadmin,
       },
+      accessToken,
+      refreshToken,
     });
   } catch (err) {
     return next(err);
@@ -91,7 +98,6 @@ export const getAllUsers = async (req, res, next) => {
 export const getUserById = async (req, res, next) => {
   try {
     const users = await User.findById(req.params.id);
-    console.log("eewew");
 
     if (!users) {
       return res
@@ -101,5 +107,14 @@ export const getUserById = async (req, res, next) => {
     return res.status(200).json({ message: users });
   } catch (err) {
     return res.status(400).json({ message: err.message });
+  }
+};
+
+export const getMe = (req, res) => {
+  try {
+    const userdata = req.user;
+    return res.status(200).json(userdata);
+  } catch (err) {
+    return res.status(404).json({ message: err });
   }
 };
