@@ -18,12 +18,13 @@ export const middleware = async (req, res, next) => {
   try {
     decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   } catch (error) {
-    return res.status(401).json({ message: "Invalid or Malformed Token" });
+    return res.status(401).json({ message: "Unauthorized" });
   }
   const user = await User.findById(decoded.id);
   if (!user) {
-    return res.status(401).json({ message: "please authenticate" });
+    return res.status(401).json({ message: "Unauthorized" });
   }
+
   req.user = user;
   next();
 };
