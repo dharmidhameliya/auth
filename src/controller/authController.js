@@ -29,17 +29,18 @@ export const register = async (req, res, next) => {
       isadmin,
     });
 
-    const token = generateToken(user.id);
-
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
     return res.status(201).json({
       status: "success",
       user: {
-        id: user._id,
-        name: user.name,
         email: user.email,
+        name: user.name,
+        id: user._id,
         isadmin: user.isadmin,
       },
-      token,
+      accessToken,
+      refreshToken,
     });
   } catch (err) {
     next(err);
@@ -65,7 +66,7 @@ export const login = async (req, res, next) => {
 
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
-    return res.status(201).json({
+    return res.status(200).json({
       status: "success",
       user: {
         email: user.email,
@@ -116,5 +117,25 @@ export const getMe = (req, res) => {
     return res.status(200).json(userdata);
   } catch (err) {
     return res.status(404).json({ message: err });
+  }
+};
+
+export const updateUser = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const updateData = req.body;
+    if (!id) {
+      return res.status(400).json({ message: "Unauthorized" });
+    }
+    if (!isadmin) {
+    }
+    const getdata = await User.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+      select: "-products",
+    });
+    return res.status(200).json({ getdata });
+  } catch (Err) {
+    return res.status(400).json({ message: Err.message });
   }
 };

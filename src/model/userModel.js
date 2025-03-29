@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 
 const userSchema = new Schema({
   name: String,
@@ -9,6 +9,7 @@ const userSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
 });
 const User = model("User", userSchema);
 export default User;

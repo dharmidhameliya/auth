@@ -18,6 +18,14 @@ const productSchema = new mongoose.Schema({
   ],
   price: { type: Number, required: true, min: 1000, max: 50000 },
   imageURL: { type: String, required: true },
+  productAddedBy: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      select: true,
+    },
+  ],
 });
 
 export const Product = mongoose.model("Product", productSchema);
